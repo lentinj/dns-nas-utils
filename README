@@ -1,0 +1,7 @@
+
+Building package
+================
+
+Can be done with this command::
+
+  fakeroot dpkg-deb --build dns-nas-utils

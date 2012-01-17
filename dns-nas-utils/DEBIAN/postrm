@@ -1,0 +1,5 @@
+#!/bin/sh
+
+if [ "$1" = "purge" ] ; then
+    update-rc.d fan_daemon remove >/dev/null
+fi

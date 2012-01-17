@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [ -x "/etc/init.d/fan_daemon" ]; then
+    update-rc.d fan_daemon defaults >/dev/null
+    invoke-rc.d fan_daemon start || exit $?
+fi
