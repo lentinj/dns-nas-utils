@@ -40,5 +40,5 @@ stty --file /dev/ttyS1 cs8 -cstopb -crtscts -ixon -ixoff -ignpar cread 19200
 
 # Other states:-
 # 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xd2 0xd2 0xd2
-# NB: Short packet, only 12 bytes
+# NB: Short packet, only 10 bytes
 # NB: 0xd2 - 0xb6 = 28, which is what the temperature should be
