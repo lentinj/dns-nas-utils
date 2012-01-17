@@ -4,36 +4,41 @@
 
 stty --file /dev/ttyS1 cs8 -cstopb -crtscts -ixon -ixoff -ignpar cread 19200
 (
-echo -ne "\xf0\xf0\x10\x04\x02"
-#sleep 0.2s
-echo -ne "\x00\x00\x00\x00"
-#sleep 0.2s
-echo -ne "\x00\x00\x00\x00"
-#sleep 0.2s
-echo -ne "\xf6\xf6\xf6"
-pos=0
-while true; do
-  read -n 1 -t 3 -s ch || exit 1
-  hex=$(echo -n $ch | hexdump -e '"%x\n"')
-  if   [ "$pos" =  "0" -a "$hex" = "f0" ]; then pos=1
-  elif [ "$pos" =  "1" -a "$hex" = "f0" ]; then pos=2
-  elif [ "$pos" =  "2" -a "$hex" = "d0" ]; then pos=3
-  elif [ "$pos" =  "3" -a "$hex" =  "4" ]; then pos=4
-  elif [ "$pos" =  "4" -a "$hex" =  "2" ]; then pos=5
-  elif [ "$pos" =  "5" ]; then pos=6; echo -n $ch | hexdump -e '"%i\n"' 1>&2
-  elif [ "$pos" =  "6" -a "$hex" =   "" ]; then pos=7
-  elif [ "$pos" =  "7" -a "$hex" =   "" ]; then pos=8
-  elif [ "$pos" =  "8" -a "$hex" =   "" ]; then pos=9
-  elif [ "$pos" =  "9" -a "$hex" =   "" ]; then pos=10
-  elif [ "$pos" = "10" -a "$hex" =   "" ]; then pos=11
-  elif [ "$pos" = "11" -a "$hex" =   "" ]; then pos=12
-  elif [ "$pos" = "12" -a "$hex" =   "" ]; then pos=13
-  elif [ "$pos" = "13" -a "$hex" = "d1" ]; then pos=14
-  elif [ "$pos" = "14" -a "$hex" = "d1" ]; then pos=15
-  elif [ "$pos" = "15" -a "$hex" = "d1" ]; then exit 0
-  else
-    echo unrecognised $hex 1>&2
-    exit 1
-  fi
-done
+  # D-link did "sleep 0.2s" between each of these, doesn't seem to be useful.
+  echo -ne "\xf0\xf0\x10\x04\x02"
+  echo -ne "\x00\x00\x00\x00"
+  echo -ne "\x00\x00\x00\x00"
+  echo -ne "\xf6\xf6\xf6"
+  pos=0
+  while true; do
+    read -n 1 -t 3 -s ch || exit 1
+    hex=$(echo -n $ch | hexdump -e '"%x\n"')
+    echo $pos $hex 1>&2
+    if   [ "$pos" =  "0" -a "$hex" = "f0" ]; then :
+    elif [ "$pos" =  "1" -a "$hex" = "f0" ]; then :
+    elif [ "$pos" =  "2" -a "$hex" = "d0" ]; then :
+    elif [ "$pos" =  "3" ]; then : # 00 or 04?
+    elif [ "$pos" =  "4" -a "$hex" =  "2" ]; then :
+    elif [ "$pos" =  "5" ]; then echo -n $ch | hexdump -e '"%i\n"' 1>&2
+    elif [ "$pos" =  "6" -a "$hex" =   "" ]; then :
+    elif [ "$pos" =  "7" -a "$hex" =   "" ]; then :
+    elif [ "$pos" =  "8" -a "$hex" =   "" ]; then :
+    elif [ "$pos" =  "9" -a "$hex" =   "" ]; then :
+    elif [ "$pos" = "10" -a "$hex" =   "" ]; then :
+    elif [ "$pos" = "11" -a "$hex" =   "" ]; then :
+    elif [ "$pos" = "12" -a "$hex" =   "" ]; then :
+    elif [ "$pos" = "13" ]; then : # 0xb6 + pos[5]
+    elif [ "$pos" = "14" ]; then : # 0xb6 + pos[5]
+    elif [ "$pos" = "15" ]; then exit 0 # 0xb6 + pos[5]
+    else
+      echo unrecognised $hex at $pos 1>&2
+ #     exit 1
+    fi
+    pos=$[pos+1]
+  done
 ) 2>&1 >/dev/ttyS1 </dev/ttyS1
+
+# Other states:-
+# 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xd2 0xd2 0xd2
+# NB: Short packet, only 12 bytes
+# NB: 0xd2 - 0xb6 = 28, which is what the temperature should be
