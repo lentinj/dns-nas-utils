@@ -1,44 +1,80 @@
 #!/bin/bash
+#
+# Get temperature from a Dlink DNS-320's microcontroller
+#
+# Copyright (C) 2012 Jamie Lentin <jm@lentin.co.uk>
 
-# Check /sys/class/hwmon/hwmon?/device/temp1_input first
+[ "$1" = "-v" ] && verbose=1
 
+# A DNS-325 will have a kernel-supported sensor, prefer that over ttyS1
+temp_file="`ls -1 /sys/class/hwmon/hwmon?/device/temp1_input 2>/dev/null`"
+if [ -n "$temp_file" ]; then
+  echo $[`cat $temp_file` / 1000]
+  exit 0
+fi
+
+# Set up serial port
 stty --file /dev/ttyS1 cs8 -cstopb -crtscts -ixon -ixoff -ignpar cread 19200
+
 (
-  # D-link did "sleep 0.2s" between each of these, doesn't seem to be useful.
+  # Wait for main thread to be ready before issuing command
+  sleep 0.1s
+  # D-link did "sleep 0.2s" between each of these, doesn't seem to help
   echo -ne "\xf0\xf0\x10\x04\x02"
   echo -ne "\x00\x00\x00\x00"
   echo -ne "\x00\x00\x00\x00"
   echo -ne "\xf6\xf6\xf6"
-  pos=0
-  while true; do
-    read -n 1 -t 3 -s ch || exit 1
-    hex=$(echo -n $ch | hexdump -e '"%x\n"')
-    echo $pos $hex 1>&2
-    if   [ "$pos" =  "0" -a "$hex" = "f0" ]; then :
-    elif [ "$pos" =  "1" -a "$hex" = "f0" ]; then :
-    elif [ "$pos" =  "2" -a "$hex" = "d0" ]; then :
-    elif [ "$pos" =  "3" ]; then : # 00 or 04?
-    elif [ "$pos" =  "4" -a "$hex" =  "2" ]; then :
-    elif [ "$pos" =  "5" ]; then echo -n $ch | hexdump -e '"%i\n"' 1>&2
-    elif [ "$pos" =  "6" -a "$hex" =   "" ]; then :
-    elif [ "$pos" =  "7" -a "$hex" =   "" ]; then :
-    elif [ "$pos" =  "8" -a "$hex" =   "" ]; then :
-    elif [ "$pos" =  "9" -a "$hex" =   "" ]; then :
-    elif [ "$pos" = "10" -a "$hex" =   "" ]; then :
-    elif [ "$pos" = "11" -a "$hex" =   "" ]; then :
-    elif [ "$pos" = "12" -a "$hex" =   "" ]; then :
-    elif [ "$pos" = "13" ]; then : # 0xb6 + pos[5]
-    elif [ "$pos" = "14" ]; then : # 0xb6 + pos[5]
-    elif [ "$pos" = "15" ]; then exit 0 # 0xb6 + pos[5]
-    else
-      echo unrecognised $hex at $pos 1>&2
- #     exit 1
-    fi
-    pos=$[pos+1]
-  done
-) 2>&1 >/dev/ttyS1 </dev/ttyS1
+) >/dev/ttyS1 &
 
-# Other states:-
-# 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xd2 0xd2 0xd2
-# NB: Short packet, only 10 bytes
-# NB: 0xd2 - 0xb6 = 28, which is what the temperature should be
+(
+  pos=0
+  temp=0
+  ch=0 ; p1=0 ; p2=0
+  while read -n 1 -t 2 -s raw; do
+    ch=$(echo -n $raw | hexdump -e '"%i"')
+    [ -z "$ch" ] && ch=0
+    [ -n "$verbose" ] && debug="`printf "$debug %x" $ch`"
+    
+    # If have initial 0xf0 0xf0 0xd0, then know where temperature is
+    [ "$pos" = "2" -a "$p2" -eq "240" \
+                   -a "$p1" -eq "240" \
+                   -a "$ch" -eq "208" ] && packet="std"
+    [ "$pos" = "5" -a "$packet" = "std" ] && temp=$ch
+    
+    # Three equal non-null bytes is the checksum at the end
+    [ "$ch" -gt "0" -a "$p2" -eq "$ch" \
+                    -a "$p1" -eq "$ch" ] && { checksum="$ch"; break; }
+    pos=$[pos+1]
+    p2=$p1
+    p1=$ch
+  done
+  [ -n "$verbose" ] && printf "debug: $debug\n" 1>&2
+  if [ "$temp" -gt "0" ]; then
+    # Got a temperature
+    echo $temp
+  elif [ -n "$checksum" ]; then
+    # Found a checksum that tells us the temperature
+    echo $[checksum - 182]
+  else
+    echo "Unknown response: $debug" 1>&2
+  fi
+) </dev/ttyS1
+
+# == Request ==
+#  0xf0 0xf0 0x10 0x04
+#  0x02 0x00 0x00 0x00
+#  0x00 0x00 0x00 0x00
+#  0x00 0xf6 0xf6 0xf6
+# == Response ===
+# General return format:-
+#  0xf0 0xf0 0xd0 (x)
+#  0x02 (t)  0x00 0x00
+#  0x00 0x00 0x00 0x00
+#  0x00 (cs) (cs) (cs)
+#   (x) = 0x00 or 0x04
+#   (t) = Temperature in degC
+#  (cs) = 0xb6 + (t)
+#
+# Malformed:-
+# 28degC: 0 0 0 0 0 0 0 d2 d2 d2
+# 32degC: f0 f0 d0 4 2 0 0 0 0 0 0 0 0 d6 d6 d6
