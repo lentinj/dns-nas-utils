@@ -13,7 +13,9 @@ speed=0
 while true; do
   debug -n "Temperatures: "
   temp=0
-  temps="$(hddtemp -n /dev/disk/by-id/ata-*) $(( ($(cat /sys/class/hwmon/hwmon*/device/temp*_input) / 1000) - 5 ))"
+  temps="$(( ($(cat /sys/class/hwmon/hwmon*/device/temp*_input) / 1000) - 5 ))"
+  # No HDD temperature for now, triggers HDD idle timer
+  # temps="$temps $(hddtemp -n /dev/disk/by-id/ata-*)"
   for t in $temps; do
     debug -n "$t "
     [ $temp -lt $t ] && temp=$t

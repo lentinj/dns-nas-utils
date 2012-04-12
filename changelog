@@ -1,5 +1,6 @@
 dns-nas-utils (1.1-1)
 
+  * Knobble HDD temperature sensing for now until I find a better way
   * Unset LANG so read does not try to interpret response as multibyte
     characters (thanks to Marko von Oppen)
 
