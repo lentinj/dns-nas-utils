@@ -1,3 +1,29 @@
+This is a small set of tools for making your D-Link NAS do it's thing.
+Supports at least the DNS-320 and DNS-325
+
+Installing
+==========
+
+Until I get around to adding it to an apt repository, it can be installed
+thus::
+
+  wget https://github.com/lentinj/dns-nas-utils/raw/master/dns-nas-utils.deb
+  dpkg -i dns-nas-utils.deb
+
+Temperature
+===========
+
+Reads temperature (either via. I2C or ttyS1) and returns in degC. For example::
+
+  # dns_temp
+  38
+
+Fan Control
+===========
+
+A small shell-based daemon to control the fan based on NAS temperature. In
+theory it can measure temperature of HDDs too, however hddtemp counts as
+activity as far as the HDDs are concerned, so won't spin down.
 
 Building package
 ================
