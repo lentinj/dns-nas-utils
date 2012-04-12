@@ -10,6 +10,9 @@
 
 [ "$1" = "-v" ] && verbose=1
 
+# A UTF-8 LANG will cause bashes read to read multibyte characters
+unset LANG
+
 # A DNS-325 will have a kernel-supported sensor, prefer that over ttyS1
 temp_file="`ls -1 /sys/class/hwmon/hwmon?/device/temp1_input 2>/dev/null`"
 if [ -n "$temp_file" ]; then

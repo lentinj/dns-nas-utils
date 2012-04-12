@@ -1,3 +1,10 @@
+dns-nas-utils (1.1-1)
+
+  * Unset LANG so read does not try to interpret response as multibyte
+    characters (thanks to Marko von Oppen)
+
+ -- Jamie Lentin <jm@lentin.co.uk> 2012-04-12
+
 dns-nas-utils (1.0-1)
 
   * Initial Release
