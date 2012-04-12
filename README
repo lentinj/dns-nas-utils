@@ -4,4 +4,5 @@ Building package
 
 Can be done with this command::
 
+  gzip -9c changelog > dns-nas-utils/usr/share/doc/dns-nas-utils/changelog.gz
   fakeroot dpkg-deb --build dns-nas-utils
