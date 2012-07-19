@@ -4,7 +4,6 @@ Section: admin
 Priority: optional
 Architecture: all
 Installed-Size: 64
-Depends: hddtemp
 Maintainer: Jamie Lentin <jm@lentin.co.uk>
 Description: Miscallaneous scripts for D-Link NASes, DNS-325 and DNS-320
  This package contains:-

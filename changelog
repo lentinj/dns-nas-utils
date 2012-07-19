@@ -1,6 +1,7 @@
 dns-nas-utils (1.2-1)
   * Actually make fan_daemon work on both, as opposed to just pretending
     I have (thanks to Wojciech Waga)
+  * Doesn't actually depend on hddtemp now
 
 dns-nas-utils (1.1-1)
 
