@@ -10,8 +10,8 @@
 
 [ "$1" = "-v" ] && verbose=1
 
-# A UTF-8 LANG will cause bashes read to read multibyte characters
-unset LANG
+unset LANG	# A UTF-8 LANG will cause bashes read to read multibyte characters
+IFS=''		# Stop read treating " " as a field separator
 
 # A DNS-325 will have a kernel-supported sensor, prefer that over ttyS1
 temp_file="`ls -1 /sys/class/hwmon/hwmon?/device/temp1_input 2>/dev/null`"
@@ -83,4 +83,10 @@ stty --file /dev/ttyS1 cs8 -cstopb -crtscts -ixon -ixoff -ignpar cread 19200
 #
 # Malformed:-
 # 28degC: 0 0 0 0 0 0 0 d2 d2 d2
-# 32degC: f0 f0 d0 4 2 0 0 0 0 0 0 0 0 d6 d6 d6
+#
+# == Testing ==
+# Switch input/output to STDIN & /dev/null
+# for f in `seq 0 50`; do
+#   echo -n "$f : "
+#   echo -ne "\xf0\xf0\xd0\x04\x02\x$(printf "%x" $f)\x00\x00\x00\x00\x00\x00\x00\xb6\xb6\xb6" | ./dns-nas-utils/usr/bin/dns_temp
+# done
