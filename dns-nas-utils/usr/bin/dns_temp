@@ -38,8 +38,7 @@ stty --file /dev/ttyS1 cs8 -cstopb -crtscts -ixon -ixoff -ignpar cread 19200
   temp=0
   ch=0 ; p1=0 ; p2=0
   while read -n 1 -t 2 -s raw; do
-    ch=$(echo -n $raw | hexdump -e '"%i"')
-    [ -z "$ch" ] && ch=0
+    ch=$(printf "%d" "'$raw")
     [ -n "$verbose" ] && debug="`printf "$debug %x" $ch`"
     
     # If have initial 0xf0 0xf0 0xd0, then know where temperature is
