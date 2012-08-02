@@ -37,7 +37,7 @@ stty --file /dev/ttyS1 cs8 -cstopb -crtscts -ixon -ixoff -ignpar cread 19200
   pos=0
   temp=0
   ch=0 ; p1=0 ; p2=0
-  while read -n 1 -t 2 -s raw; do
+  while read -d '' -r -n 1 -t 2 -s raw; do
     ch=$(printf "%d" "'$raw")
     [ -n "$verbose" ] && debug="`printf "$debug %x" $ch`"
     

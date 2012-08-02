@@ -1,6 +1,7 @@
 dns-nas-utils (1.3-1)
   * Fix operation at 42degC (from Brandur Simonsen, thanks!)
   * Fix operation at 32degC
+  * Fix operation at 10degC
 
 dns-nas-utils (1.2-1)
   * Actually make fan_daemon work on both, as opposed to just pretending
