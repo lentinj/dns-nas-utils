@@ -1,3 +1,6 @@
+dns-nas-utils (1.5-1)
+  * Force lang to C in order to prevent UTF-8 multibyte error (thanks KiLMaN)
+
 dns-nas-utils (1.4-1)
   * Be more flexible when searching for fan device (thanks Ross Bradley)
 
