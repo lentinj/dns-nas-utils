@@ -11,6 +11,7 @@
 [ "$1" = "-v" ] && verbose=1
 
 unset LANG	# A UTF-8 LANG will cause bashes read to read multibyte characters
+export LC_ALL=C # Force a non UTF-8 Lang to load (prevent multibyte characters)
 IFS=''		# Stop read treating " " as a field separator
 
 # A DNS-325 will have a kernel-supported sensor, prefer that over ttyS1
