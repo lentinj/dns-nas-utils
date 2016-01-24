@@ -1,3 +1,6 @@
+dns-nas-utils (2.Alpha)
+  * Alpha code branch to improve how the entirely system works and put all scripts to work together.
+
 dns-nas-utils (1.5-1)
   * Force lang to C in order to prevent UTF-8 multibyte error (thanks KiLMaN)
 
