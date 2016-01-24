@@ -1,0 +1,38 @@
+#!/bin/bash
+
+sleep_time=1
+
+leds=('/sys/devices/gpio-leds/leds/dns320:orange:l_hdd/brightness' 
+	  '/sys/devices/gpio-leds/leds/dns320:orange:r_hdd/brightness' 
+	  '/sys/devices/gpio-leds/leds/dns320:orange:usb/brightness')
+stats=('/sys/block/sda/stat'
+	   '/sys/block/sdb/stat'
+	   '/sys/block/sdc/stat')
+olds=(' ' ' ' ' ')
+values=(255 255 255)
+
+function set_led
+{
+  currstats="$(cat ${stats[$1]})"
+  if [ "${olds[$1]}" != "$currstats" ]; then
+    olds[$1]="$currstats"
+    values[$1]=255
+  else 
+	  values[$1]=0
+  fi
+}
+
+while true; do
+  echo 0 > ${leds[0]}
+  echo 0 > ${leds[1]}
+  echo 0 > ${leds[2]}
+  sleep $sleep_time
+  set_led 0
+  set_led 1
+  set_led 2
+  echo "${values[0]}" > ${leds[0]}
+  echo "${values[1]}" > ${leds[1]}
+  echo "${values[2]}" > ${leds[2]}
+  sleep $sleep_time
+done
+
