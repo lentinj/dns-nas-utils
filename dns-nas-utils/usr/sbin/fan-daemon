@@ -1,21 +1,24 @@
 #!/bin/sh
 
+# Setup parameters. Many of them must be moved to a general config file
 low_thresh=45
 high_thresh=50
 hysteresis=2
+speed=6000
+fan_device=/sys/devices/gpio_fan/hwmon/hwmon0/fan1_target
+sleep_time=10
 
-fan_device=/sys/bus/platform/devices/gpio*fan*/fan1_target
+# Set fan to maxium speed for safety. If the script crash at least the fan runs at max.
+echo $speed > $fan_device
 
 debug() { :; }
 
-speed=0
 # Fetch all useful temperature readings
 while true; do
   debug -n "Temperatures: "
   temp=0
   temps="$(/usr/bin/dns_temp)"
-  # No HDD temperature for now, triggers HDD idle timer
-  # temps="$temps $(hddtemp -n /dev/disk/by-id/ata-*)"
+
   for t in $temps; do
     debug -n "$t "
     [ $temp -lt $t ] && temp=$t
@@ -33,7 +36,13 @@ while true; do
   else
     speed=6000
   fi
-  debug "Fan speed: $speed"
-  echo $speed > $fan_device
-  sleep 10
+
+  # If the current speed is not equal to the desired speed, change it an show messages.
+  if [ $speed -ne "$(cat $fan_device)" ]; then
+    echo $speed > $fan_device
+    echo "fan-daemon: $(date) Current temp is $temp change fan speed to $speed RPM" > /dev/kmsg
+    debug "fan-daemon: $(date) Current temp is $temp change fan speed to $speed RPM"
+  fi
+
+  sleep $sleep_time
 done
