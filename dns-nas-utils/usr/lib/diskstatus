@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# Send diskstatus information to the kernel log (dmesg)
+#
+# Copyright (C) 2016 Sergi Casbas <sergi@casbas.cat>
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2.  This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+
+DISKSTATUS_TMP="/run/dns-nas-utils/diskstatus"
+mkdir -p $DISKSTATUS_TMP
+touch "$DISKSTATUS_TMP/sda"
+touch "$DISKSTATUS_TMP/sdb"
+touch "$DISKSTATUS_TMP/sdc"
+
+function diskstatus ()
+{
+	if [ -e "/dev/$1" ];then
+	echo "PASO";
+		curr_status="$(hdparm -C /dev/$1 | grep state)"
+		if [ "$curr_status" != "$(cat $DISKSTATUS_TMP/$1)" ]; then
+			old_status="$curr_status"
+			echo "$curr_status" > $DISKSTATUS_TMP/$1
+			echo -e "nas-diskstatus ($1):\033[0m $(date +'%Y-%m-%d %T')$curr_status" > /dev/kmsg
+		fi
+	fi
+}
