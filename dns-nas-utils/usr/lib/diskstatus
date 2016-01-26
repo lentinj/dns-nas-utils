@@ -17,12 +17,11 @@ touch "$DISKSTATUS_TMP/sdc"
 function diskstatus ()
 {
 	if [ -e "/dev/$1" ];then
-	echo "PASO";
 		curr_status="$(hdparm -C /dev/$1 | grep state)"
 		if [ "$curr_status" != "$(cat $DISKSTATUS_TMP/$1)" ]; then
 			old_status="$curr_status"
 			echo "$curr_status" > $DISKSTATUS_TMP/$1
-			echo -e "nas-diskstatus ($1):\033[0m $(date +'%Y-%m-%d %T')$curr_status" > /dev/kmsg
+			echo -e "nas-diskstatus ($1):\033[0m $curr_status" > /dev/kmsg
 		fi
 	fi
 }
