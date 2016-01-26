@@ -8,20 +8,21 @@
 # License version 2.  This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
 
-# Set default value for local variables.
-if [ -z "$LEDSTATUS_TMP"]; then LEDSTATUS_TMP="/run/dns-nas-utils/leds"; fi
-if [ -z "$LEDPATH"]; then LEDPATH="/sys/devices/gpio-leds/leds/dns320:orange:\$1/brightness"; fi
+# Set default value for local variables if not exists.
+if [ -z "$tmppath" ]; then tmppath="/tmp"; fi
+if [ -z "$led_device" ]; then led_device="/sys/devices/gpio-leds/leds/dns320:orange:\$1/brightness"; fi
+tmp_ledstatus="$tmppath/leds"
 
 # Prepare temporary folders and files
-mkdir -p $LEDSTATUS_TMP
-touch "$LEDSTATUS_TMP/sda"
-touch "$LEDSTATUS_TMP/sdb"
-touch "$LEDSTATUS_TMP/sdc"
+mkdir -p $tmp_ledstatus
+touch "$tmp_ledstatus/sda"
+touch "$tmp_ledstatus/sdb"
+touch "$tmp_ledstatus/sdc"
 
 # Set a led value. ($1 is the device, $2 the value)
 function set_led
 {
-	echo $2 > "$(eval echo $LEDPATH)"
+	echo $2 > "$(eval echo $led_device)"
 }
 
 # Light a led if required ($1 is the block device sd?, $2 is the led device).
@@ -30,38 +31,19 @@ function blink_led
 	# Only execute the routine if the device exists.
 	if [ -e "/dev/$1" ]; then
 		# Compare current status with saved status, if are different blink de light.
-		if [ "$(cat /sys/block/$1/stat)" != "$(cat $LEDSTATUS_TMP/$1)" ]; then
-			cat /sys/block/$1/stat > $LEDSTATUS_TMP/$1
-			set_led $2 255 & 
+		if [ "$(cat /sys/block/$1/stat)" != "$(cat $tmp_ledstatus/$1)" ]; then
+			cat /sys/block/$1/stat > $tmp_ledstatus/$1
+			set_led $2 255
 		else 
-			set_led $2 0 &
+			set_led $2 0
 		fi
 	fi
 }
 
 # Do all leds to blink if required
-function blink_leds
+function set_leds
 {
 	blink_led sda l_hdd &
 	blink_led sdb r_hdd &
 	blink_led sdc usb &
 }
-
-# Reset the current value for all disks.
-function reset_leds
-{
-	set_led l_hdd 0 &
-	set_led r_hdd 0 &
-	set_led usb 0 &
-} 
-
-# Test routines to check leds.
-function test
-{
-	while true; 
-	do
-		blink_leds
-		sleep 1
-	done
-}
-test
