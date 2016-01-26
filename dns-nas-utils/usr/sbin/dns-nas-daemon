@@ -16,7 +16,7 @@ source /etc/dns-nas-utils.conf
 
 # Include code of external libraries
 source ../lib/diskstatus
-source ../lib/hdd_leds
+source ../lib/hdd-leds
 source ../lib/fanspeed
 
 # Main bucle to process different tools in different frequencies.
