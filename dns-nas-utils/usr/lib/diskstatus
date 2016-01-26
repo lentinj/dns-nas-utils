@@ -8,20 +8,28 @@
 # License version 2.  This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
 
-DISKSTATUS_TMP="/run/dns-nas-utils/diskstatus"
-mkdir -p $DISKSTATUS_TMP
-touch "$DISKSTATUS_TMP/sda"
-touch "$DISKSTATUS_TMP/sdb"
-touch "$DISKSTATUS_TMP/sdc"
+# Set default value for local variables if not exists.
+if [ -z "$tmppath" ]; then tmppath="/tmp"; fi
+tmp_diskstatus="$tmppath/diskstatus"
 
+# Clean and initialize temporary path.
+mkdir -p $tmp_diskstatus
+touch "$tmp_diskstatus/sda"
+touch "$tmp_diskstatus/sdb"
+touch "$tmp_diskstatus/sdc"
+
+# Function to handle diskstatus.
 function diskstatus ()
 {
+	# It only works if the device exists, obviuously.
 	if [ -e "/dev/$1" ];then
+		# Read disk current status.
 		curr_status="$(hdparm -C /dev/$1 | grep state)"
-		if [ "$curr_status" != "$(cat $DISKSTATUS_TMP/$1)" ]; then
-			old_status="$curr_status"
-			echo "$curr_status" > $DISKSTATUS_TMP/$1
-			echo -e "nas-diskstatus ($1):\033[0m $curr_status" > /dev/kmsg
+
+		# If the status has been changed, save new state and send message.
+		if [ "$curr_status" != "$(cat $tmp_diskstatus/$1)" ]; then
+			echo "$curr_status" > $tmp_diskstatus/$1
+			echo -e "nas-diskstatus ($1):\033[0m$curr_status" > /dev/kmsg
 		fi
 	fi
 }
