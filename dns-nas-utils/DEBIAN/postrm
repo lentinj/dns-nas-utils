@@ -1,5 +1,5 @@
 #!/bin/sh -e
 
 if [ "$1" = "purge" ] ; then
-    update-rc.d fan-daemon remove >/dev/null
+    update-rc.d dns-nas-utils-daemon remove >/dev/null
 fi
