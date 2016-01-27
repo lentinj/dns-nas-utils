@@ -1,4 +1,13 @@
 #!/bin/bash
+# 
+# Daemon to control some hardware of dns-320/325
+# For now it handle fanspeed, diskstatus and hdd-leds
+#
+# Copyright (C) 2016 Sergi Casbas <sergi@casbas.cat>
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2.  This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
 
 # Daemon default values (can be overrided by config file)
 frequency=0.75
@@ -7,7 +16,7 @@ high_thresh=50
 hysteresis=2
 tmppath="/run/dns-nas-utils/"
 
-# Default devices.
+# Default devices (are for a dns320).
 fan_device="/sys/devices/gpio_fan/hwmon/hwmon0/fan1_target"
 led_device="/sys/devices/gpio-leds/leds/dns320:orange:\$1/brightness"
 
