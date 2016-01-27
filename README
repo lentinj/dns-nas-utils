@@ -10,6 +10,13 @@ thus::
   wget https://github.com/lentinj/dns-nas-utils/raw/master/dns-nas-utils.deb
   dpkg -i dns-nas-utils.deb
 
+Configuration
+=============
+
+Some devices or users must need different configuraiton parameters in the daemon.
+Available parameters are in a config file in etc/dns-nas-utils.conf. Check it for
+more information.
+
 Temperature
 ===========
 
@@ -18,12 +25,16 @@ Reads temperature (either via. I2C or ttyS1) and returns in degC. For example::
   # dns_temp
   38
 
-Fan Control
-===========
+NAS utils daemon
+================
 
 A small shell-based daemon to control the fan based on NAS temperature. In
 theory it can measure temperature of HDDs too, however hddtemp counts as
-activity as far as the HDDs are concerned, so won't spin down.
+activity as far as the HDDs are concerned, so won't spin down. It informs kernel
+log on changes to easily track them if required.
+
+It controls too hdd leds, to make it to blink on disk activity and send harddrive
+power state information  (idle/sleep/active) to the kernel.
 
 Building package
 ================
