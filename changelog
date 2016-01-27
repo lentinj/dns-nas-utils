@@ -1,5 +1,8 @@
-dns-nas-utils (2.Alpha)
-  * Alpha code branch to improve how the entirely system works and put all scripts to work together.
+dns-nas-utils (2.0-1)
+  * Added a new daemon to control all others from only one routine.
+  * Added HDD status to send messages to kernel about disk state (standby/active)
+  * Added messages to kernel for the fan daemon to inform about changes.
+  * Added hdd/usb leds blink on hdd/usb changes.
 
 dns-nas-utils (1.5-1)
   * Force lang to C in order to prevent UTF-8 multibyte error (thanks KiLMaN)
