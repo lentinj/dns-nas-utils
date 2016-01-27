@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
 if [ -x "/etc/init.d/fan-daemon" ]; then
-    update-rc.d fan-daemon defaults >/dev/null
-    invoke-rc.d fan-daemon start || exit $?
+    update-rc.d dns-nas-utils-daemon defaults >/dev/null
+    invoke-rc.d dns-nas-utils-daemon start || exit $?
 fi

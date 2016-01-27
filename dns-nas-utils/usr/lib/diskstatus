@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+# Send diskstatus information to the kernel log (dmesg)
+#
+# Copyright (C) 2016 Sergi Casbas <sergi@casbas.cat>
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2.  This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+
+# Set default value for local variables if not exists.
+if [ -z "$tmppath" ]; then tmppath="/tmp"; fi
+tmp_diskstatus="$tmppath/diskstatus"
+
+# Clean and initialize temporary path.
+mkdir -p $tmp_diskstatus
+touch "$tmp_diskstatus/sda"
+touch "$tmp_diskstatus/sdb"
+touch "$tmp_diskstatus/sdc"
+
+# Function to handle diskstatus.
+function diskstatus ()
+{
+	# It only works if the device exists, obviuously.
+	if [ -e "/dev/$1" ];then
+		# Read disk current status.
+		curr_status="$(hdparm -C /dev/$1 | grep state)"
+
+		# If the status has been changed, save new state and send message.
+		if [ "$curr_status" != "$(cat $tmp_diskstatus/$1)" ]; then
+			echo "$curr_status" > $tmp_diskstatus/$1
+			echo -e "nas-diskstatus ($1):\033[0m$curr_status" > /dev/kmsg
+		fi
+	fi
+}

@@ -1,22 +1,23 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          fan-daemon
+# Provides:          dns-nas-utils
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Fan daemon
-# Description:       Start the fan-controlling daemon for a DNS-325
+# Short-Description: Special dlink hardware daemon.
+# Description:       Start DNS-320/325 daemon to control some hardware.
 ### END INIT INFO
 
 # Author: Jamie Lentin <jm@lentin.co.uk>
+# Modified by Sergi Casbas <sergi@casbas.cat> to be a substitute for dns-nas-utils.
 
 # Do NOT "set -e"
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="DNS-325 fan daemon"
-NAME=fan-daemon
+DESC="DNS-320/325 fan daemon"
+NAME=dns-nas-utils
 DAEMON=/usr/sbin/$NAME
 DAEMON_ARGS=""
 PIDFILE=/var/run/$NAME.pid
