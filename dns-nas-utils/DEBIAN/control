@@ -1,12 +1,14 @@
 Package: dns-nas-utils
-Version: 1.5
+Version: 2.0
 Section: admin
 Priority: optional
 Architecture: all
 Installed-Size: 64
-Maintainer: Jamie Lentin <jm@lentin.co.uk>
+Maintainer: Sergi Casbas <sergi@casbas.cat>
 Description: Miscallaneous scripts for D-Link NASes, DNS-325 and DNS-320
  This package contains:-
-  fan-daemon: Controls the fan based on hdd and board temperature
+  dns-nas-utils: Controls fan based on hdd and board temperature, send 
+                 kernel messages about system temp and hdd status and
+                 handle hdd leds.
   dns_temp: Fetches the temperature of the NAS, either via I2C or serial
 
