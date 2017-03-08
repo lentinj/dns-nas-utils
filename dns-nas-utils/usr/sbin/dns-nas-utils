@@ -24,9 +24,9 @@ led_device="/sys/devices/gpio-leds/leds/dns320:orange:\$1/brightness"
 source /etc/dns-nas-utils.conf
 
 # Include code of external libraries
-source ../lib/diskstatus
-source ../lib/hdd-leds
-source ../lib/fanspeed
+source /usr/lib/dns-nas-utils/diskstatus
+source /usr/lib/dns-nas-utils/hdd-leds
+source /usr/lib/dns-nas-utils/fanspeed
 
 # Main bucle to process different tools in different frequencies.
 # There is a bucle with a frequency 10 times higher than low frequency.
