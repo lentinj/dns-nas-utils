@@ -16,6 +16,9 @@ high_thresh=50
 hysteresis=2
 tmppath="/run/dns-nas-utils/"
 
+# Clean tmppath if exists.
+rm -r "$tmppath" 2>/dev/null
+
 # Default devices (are for a dns320).
 fan_device="/sys/devices/gpio_fan/hwmon/hwmon0/fan1_target"
 led_device="/sys/devices/gpio-leds/leds/dns320:orange:\$1/brightness"
