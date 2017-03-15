@@ -1,0 +1,48 @@
+#!/bin/bash
+#
+# Control diskstation fan
+#
+# v1-Copyright (C) 2012 Jamie Lentin <jm@lentin.co.uk>
+# v2-Copyright (C) 2016 Sergi Casbas <sergi@casbas.cat>
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2.  This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+
+# Set default value for local variables if not exists.
+if [ -z "$low_thresh" ];  then low_thresh=45=; fi
+if [ -z "$high_thresh" ]; then high_thresh=50; fi
+if [ -z "$hysteresis" ];  then hysteresis=2; fi
+if [ -z "$fan_device" ];  then fan_device="/sys/devices/gpio_fan/hwmon/hwmon0/fan1_target"; fi
+
+# Set fan to maxium speed for safety. If the script crash at least the fan runs at max.
+speed=6000
+echo $speed > $fan_device
+
+function set_fanspeed
+{
+	# Search the highest temperature in dns_temp output. 
+	temp=0
+	for t in "$(/usr/bin/dns_temp)"; do
+		[ $temp -lt $t ] && temp=$t
+	done
+
+	# Choose right fan speed base on maxium temperature.
+	if [ $temp -lt $((low_thresh - hysteresis)) ]; then
+		speed=0
+	elif [ $temp -lt $low_thresh ]; then
+		[ $speed -gt 3000 ] && speed=3000
+		elif [ $temp -lt $((high_thresh - hysteresis)) ]; then
+		speed=3000
+	elif [ $temp -lt $high_thresh ]; then
+		[ $speed -lt 3000 ] && speed=3000
+	else
+		speed=6000
+	fi
+
+	 # If the current speed is not equal to the desired speed, change it an send message to kernel.
+	if [ $speed -ne "$(cat $fan_device)" ]; then
+		echo $speed > $fan_device
+		echo -e "fan-daemon:\033[0m Current temp is $temp degrees(C) set fan to: $speed RPM" > /dev/kmsg
+	fi
+}
