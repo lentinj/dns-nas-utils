@@ -4,6 +4,7 @@ low_thresh=45
 high_thresh=50
 hysteresis=2
 
+/sbin/modprobe gpio_fan
 fan_device=`find /sys/ -name 'fan1_target' | head -1`
 
 debug() { :; }
