@@ -4,7 +4,7 @@ low_thresh=45
 high_thresh=50
 hysteresis=2
 
-fan_device=/sys/bus/platform/devices/gpio*fan*/fan1_target
+fan_device=`find /sys/ -name 'fan1_target' | head -1`
 
 debug() { :; }
 
